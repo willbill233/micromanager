@@ -1,0 +1,61 @@
+<div class="modal-demo">
+  <!-- Top Nav -->
+  <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">uManager</a>
+      </div>
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li>
+            <a href="#">Dashboards</a>
+          </li>
+          <li>
+            <a href="#">Admin</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Side navbar -->
+      <div class="col-lg-2">
+        <h1 class="lead">Dashboards</h1>
+        <div class="list-group">
+          <a href="#" class="list-group-item active" ng-click="main.open()">Project Management</a>
+          <a href="#" class="list-group-item">Core Platforms</a>
+          <a href="#" class="list-group-item">Web Team</a>
+        </div>
+      </div>
+
+      <!-- Main section -->
+      <div class="col-lg-10">
+        <button ng-click="main.createTaskClicked()">MODAL</button>
+        <iframe src="https://trello.com/b/VI7zJBU0.html" frameBorder="0" width="100%" height="600"></iframe>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="container-fluid" style="background: #222">
+    <!-- Footer -->
+    <footer class="text-center">
+      <div class="row">
+        <div class="col-lg-12">
+          <p class="text-center" style="color: white;padding-top: 25px; padding-bottom: 25px">Copyright &copy; uManager 2017</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+</div>
