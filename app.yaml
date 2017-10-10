@@ -5,21 +5,20 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+- url: /rest/tasks
+  script: service.tasks.main.APP
 
 - url: /(.+)
-  static_files: dist/\1
-  upload: dist/(.*)
+  static_files: ./\1
+  upload: ./(.*)
 
 - url: /
-  static_files: dist/index.html
-  upload: dist/index.html
+  static_files: ./index.html
+  upload: ./index.html
 
 skip_files:
-- ^(.*/)?app\.yaml
-- ^(.*/)?app\.yml
 - ^(.*/)?#.*#
 - ^(.*/)?.*~
-- ^(.*/)?.*\.py[co]
 - ^(.*/)?.*/RCS/.*
 - ^(.*/)?\..*
 - ^(.*/)?tests$

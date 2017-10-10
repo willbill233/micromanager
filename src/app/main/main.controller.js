@@ -1,5 +1,5 @@
 export class MainController {
-  constructor ($uibModal, $scope, $rootScope, $log) {
+  constructor ($uibModal, $scope, $rootScope, $log, $resource) {
     'ngInject';
 
     this.$ctrl = this;
@@ -7,7 +7,16 @@ export class MainController {
     this.$rootScope = $rootScope;
     this.$log = $log;
     this.$uibModal = $uibModal;
+    this.$resource = $resource;
+    this.tasksService = $resource('/rest/tasks');
     this.modalInstance = null;
+    this.tasks = null;
+
+    this.response = this.tasksService.query();
+    this.response.$promise.then(data => {
+      this.tasks = data;
+      console.log(this.tasks);
+    });
 
   }
 
