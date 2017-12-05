@@ -1,0 +1,8 @@
+Flask==0.12.2
+webob==1.7.3
+webapp2==2.5.2
+requests==2.18.4
+PyMongo==2.8
+Flask-PyMongo==0.5.1
+click==5.1
+gunicorn==19.3.0

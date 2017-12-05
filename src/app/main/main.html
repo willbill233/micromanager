@@ -41,7 +41,21 @@
       <!-- Main section -->
       <div class="col-lg-10">
         <button ng-click="main.createTaskClicked()">MODAL</button>
-        <iframe src="https://trello.com/b/VI7zJBU0.html" frameBorder="0" width="100%" height="600"></iframe>
+        <iframe src="https://trello.com/b/VI7zJBU0.html" frameBorder="0" width="100%" height="400"></iframe>
+        <table class="table table-responsive table-dark">
+          <tr>
+            <th>Task</th>
+            <th>Team</th>
+            <th colspan="2">Actions</th>
+          </tr>
+          <tr ng-repeat="task in main.tasks">
+            <td><span class="card"><span>{{task.name}}</span></span></td>
+            <td>not done yet</td>
+            <td><i style="cursor: pointer" class="fa fa-pencil"></i></td>
+            <td><i style="cursor: pointer" class="fa fa-trash"></i></td>
+          </tr>
+
+        </table>
 
       </div>
     </div>
@@ -52,7 +66,8 @@
     <footer class="text-center">
       <div class="row">
         <div class="col-lg-12">
-          <p class="text-center" style="color: white;padding-top: 25px; padding-bottom: 25px">Copyright &copy; uManager 2017</p>
+          <p class="text-center" style="color: white;padding-top: 25px; padding-bottom: 25px">Copyright &copy; uManager
+            2017</p>
         </div>
       </div>
     </footer>

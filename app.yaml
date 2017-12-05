@@ -6,7 +6,7 @@ threadsafe: yes
 
 handlers:
 - url: /rest/tasks
-  script: service.tasks.main.APP
+  script: service.tasks.APP
 
 - url: /(.+)
   static_files: ./\1

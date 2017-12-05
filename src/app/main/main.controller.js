@@ -15,7 +15,6 @@ export class MainController {
     this.response = this.tasksService.query();
     this.response.$promise.then(data => {
       this.tasks = data;
-      console.log(this.tasks);
     });
 
   }
