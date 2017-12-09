@@ -46,35 +46,58 @@ def init_app():
 
 
 # [START list]
-def list():
+def list(db):
   mongo = init_app()
-  results = mongo.tasks.find().sort('name')
+  results = mongo[db].find()
   tasks = builtin_list(map(from_mongo, results))
 
   return tasks
 # [END list]
 
 
+# [START list_where_value_in_array]
+def list_where_value_in_array(db, key, values):
+  mongo = init_app()
+  results = mongo[db].find({key: { "$in": values }})
+  tasks = builtin_list(map(from_mongo, results))
+
+  return tasks
+# [END list_where_value_in_array]
+#
+#  [START list_where_array_has_value]
+def list_where_value_matches(db, key, value):
+  mongo = init_app()
+  results = mongo[db].find({ key: value })
+  tasks = builtin_list(map(from_mongo, results))
+
+  return tasks
+# [END list_where_array_has_value]
+
+
 # [START read]
-def read(id):
-  result = mongo.db.tasks.find_one(_id(id))
+def read(id, db):
+  mongo = init_app()
+  result = mongo[db].find_one(_id(id))
   return from_mongo(result)
 # [END read]
 
 
 # [START create]
-def create(data):
-  new_id = mongo.db.tasks.insert(data)
-  return read(new_id)
+def create(data, db):
+  mongo = init_app()
+  new_id = mongo[db].insert(data)
+  return read(new_id, db)
 # [END create]
 
 
 # [START update]
-def update(data, id):
-  mongo.db.tasks.update({'_id': _id(id)}, data)
-  return read(id)
+def update(data, id, db):
+  mongo = init_app()
+  mongo[db].update({'_id': _id(id)}, data)
+  return read(id, db)
 # [END update]
 
 
-def delete(id):
-  mongo.db.tasks.remove(_id(id))
+def delete(id, db):
+  mongo = init_app()
+  mongo[db].remove(_id(id))

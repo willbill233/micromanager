@@ -6,3 +6,4 @@ PyMongo==2.8
 Flask-PyMongo==0.5.1
 click==5.1
 gunicorn==19.3.0
+requests-toolbelt==0.8.0

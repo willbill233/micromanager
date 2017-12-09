@@ -8,6 +8,15 @@ handlers:
 - url: /rest/tasks
   script: service.tasks.APP
 
+- url: /rest/task
+  script: service.tasks.APP
+
+- url: /rest/boards
+  script: service.boards.APP
+
+- url: /rest/auth
+  script: service.auth.APP
+
 - url: /(.+)
   static_files: ./\1
   upload: ./(.*)
