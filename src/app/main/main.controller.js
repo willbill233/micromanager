@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export class MainController {
-  constructor ($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce) {
+  constructor ($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state) {
     'ngInject';
 
     this.$ctrl = this;
@@ -11,13 +11,14 @@ export class MainController {
     this.$uibModal = $uibModal;
     this.$stateParams = $stateParams;
     this.$sce = $sce;
+    this.$state = $state;
     this.$resource = $resource;
     this.tasksService = $resource('/rest/tasks');
     this.boardsService = $resource('/rest/boards');
     this.modalInstance = null;
     this.tasks = null;
     this.boards = null;
-    this.user = this.$stateParams.user;
+    this.user = this.getAuthenticatedUser();
     this.user.visibleBoards.secondary.push(this.user.visibleBoards.main);
     this.currentBoard = null;
 
@@ -52,6 +53,11 @@ export class MainController {
     this.getTasksForBoard(board.idShort)
   }
 
+  onLogOutClicked(){
+    this.user = null;
+    this.$state.go('signin');
+  }
+
   getTasksForBoard(id){
     this.response = this.tasksService.query({ 'board_id': id });
     this.isLoading = true;
@@ -72,7 +78,13 @@ export class MainController {
   }
 
   setBoardUrl(id){
-    console.log(id);
     this.boardUrl = this.$sce.trustAsResourceUrl('https://trello.com/b/'+id+'.html');
+  }
+
+  getAuthenticatedUser(){
+    if(this.$stateParams.user){
+      return this.$stateParams.user;
+    }
+    this.$state.go('unauthorised');
   }
 }

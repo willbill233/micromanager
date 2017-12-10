@@ -26,8 +26,10 @@ class AuthHandler(RestHandler):
     for user in users:
       if user["email"] == payload["email"] and user["password"] == payload["password"]:
         response = user
+        response["message"] = "User Authenticated"
+        response["failed"] = False
     if response is None:
-      response = "User Authentication Failed"
+      response = { "message": "User Authentication Failed. Email or Password incorrect.", "failed": True }
     self.send_json(dumps(response))
 
 

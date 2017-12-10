@@ -15,6 +15,12 @@ export function routerConfig ($stateProvider, $urlRouterProvider) {
       templateUrl: 'app/signin/signin.html',
       controller: 'SigninController',
       controllerAs: 'signin'
+    })
+    .state('unauthorised', {
+      url: '/unauthorised',
+      templateUrl: 'app/signin/unauthorised.html',
+      controller: 'UnauthorisedController',
+      controllerAs: 'unauth'
     });
 
   $urlRouterProvider.otherwise('/');

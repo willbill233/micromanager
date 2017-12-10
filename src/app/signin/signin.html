@@ -11,7 +11,8 @@
           <input type="checkbox" value="remember-me"> Remember me
         </label>
       </div>
-      <button class="btn btn-lg btn-primary btn-block" ng-click="signin.onSigninClicked()" type="submit">Sign in</button>
+      <span class="danger" ng-show="signin.errorMessage"><i class="fa fa-exclamation-circle"></i>  {{signin.errorMessage}}</span>
+      <button style="margin-top: 10px" class="btn btn-lg btn-primary btn-block" ng-click="signin.onSigninClicked()" type="submit">Sign in</button>
     </form>
     <div id="loader" ng-show="signin.isLoading"></div>
   </div>

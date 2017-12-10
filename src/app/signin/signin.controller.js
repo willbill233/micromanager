@@ -2,7 +2,6 @@ export class SigninController {
   constructor($scope, $rootScope, $log, $resource, $state) {
     'ngInject';
 
-    this.$ctrl = this;
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$log = $log;
@@ -12,7 +11,7 @@ export class SigninController {
     this.user = null;
     this.email = null;
     this.password = null;
-
+    this.errorMessage = null;
   }
 
   onSigninClicked() {
@@ -23,13 +22,19 @@ export class SigninController {
     this.response = this.authService.save(this.user);
     this.isLoading = true;
     this.response.$promise.then(data => {
-      if(data.visibleBoards){
+      this.user = null;
+      this.email = null;
+      this.password = null;
+      this.isLoading = false;
+      if(!data.failed){
         this.$state.go('home', { user: data });
+      } else {
+        this.errorMessage = data.message;
       }
-      this.isLoading = false;
     }, (reason) => {
-      this.$log.log(reason);
       this.isLoading = false;
+      this.$log.log(reason);
+      this.errorMessage = reason;
     });
   }
 }
