@@ -47,13 +47,15 @@
           <tr>
             <th>Task</th>
             <th>Team</th>
+            <th>Last Update</th>
             <th colspan="2">Actions</th>
           </tr>
           <tr ng-repeat="task in main.tasks">
             <td><span class="card"><span>{{task.name}}</span></span></td>
-            <td>not done yet</td>
-            <td><i style="cursor: pointer" class="fa fa-pencil"></i></td>
-            <td><i style="cursor: pointer" class="fa fa-trash"></i></td>
+            <td>{{task.team.name}}</td>
+            <td>{{task.dateLastActivity | date:'dd/MM/yyyy HH:mm'}}</td>
+            <td><button style="cursor: pointer" class="fa fa-pencil"></button></td>
+            <td><button style="cursor: pointer" class="fa fa-trash"></button></td>
           </tr>
         </table>
         <div id="loader" ng-show="main.isLoading"></div>

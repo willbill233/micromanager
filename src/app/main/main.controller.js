@@ -19,10 +19,11 @@ export class MainController {
     this.tasks = null;
     this.boards = null;
     this.user = this.getAuthenticatedUser();
-    this.user.visibleBoards.secondary.push(this.user.visibleBoards.main);
+    this.queryBoards = this.user.visibleBoards.secondary.slice(0);
+    this.queryBoards.push(this.user.visibleBoards.main);
     this.currentBoard = null;
 
-    this.response = this.boardsService.query({ 'board_ids': this.user.visibleBoards.secondary });
+    this.response = this.boardsService.query({ 'board_ids': this.queryBoards });
     this.isLoading = true;
     this.response.$promise.then(data => {
       this.boards = data;
@@ -38,7 +39,15 @@ export class MainController {
     this.modalInstance = this.$uibModal.open({
       templateUrl: 'app/task/createtaskmodal.html',
       controller: 'CreateTaskController',
-      controllerAs: '$ctrl'
+      controllerAs: '$ctrl',
+      resolve: {
+        boards: () => {
+          return this.boards;
+        },
+        currentBoard: () => {
+          return this.currentBoard;
+        }
+      }
     });
     this.modalInstance.result.then(() => {
       //OK PRESSED

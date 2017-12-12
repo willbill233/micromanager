@@ -19,21 +19,21 @@
       <label class="col-sm-2 control-label" for="cardTeam">Team <span style="color: red">*</span></label>
       <div class="col-sm-10">
         <select required class="form-control" ng-init="$ctrl.team = $ctrl.teams[0]" ng-model="$ctrl.team" id="cardTeam"
-                ng-options="team as team.label for team in $ctrl.teams" ng-change="$ctrl.validateTeam($ctrl.team)"></select>
+                ng-options="team as team.name for team in $ctrl.teams" ng-change="$ctrl.validateTeam($ctrl.team)"></select>
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-2 control-label" for="cardTeam">Phase <span style="color: red">*</span></label>
       <div class="col-sm-10">
         <select required class="form-control" ng-init="$ctrl.phase = $ctrl.phases[0]" ng-model="$ctrl.phase" id="cardPhase"
-                ng-options="phase as phase.label for phase in $ctrl.phases" ng-change="$ctrl.validatePhase($ctrl.phase)"></select>
+                ng-options="phase as phase.phase for phase in $ctrl.phases" ng-disabled="$ctrl.phaseDisabled" ng-change="$ctrl.validatePhase($ctrl.phase)"></select>
       </div>
     </div>
     <div class="form-group">
       <label class="col-sm-2 control-label" for="cardTeam">Status <span style="color: red">*</span></label>
       <div class="col-sm-10">
         <select required class="form-control" ng-init="$ctrl.status = $ctrl.statuses[0]" ng-model="$ctrl.status" id="cardStatus"
-                ng-options="status as status.label for status in $ctrl.statuses"></select>
+                ng-options="status as status.status for status in $ctrl.statuses"></select>
       </div>
     </div>
     <span class="col-sm-12 danger" ng-show="$ctrl.message"><i class="fa fa-exclamation-circle"></i>  {{$ctrl.message}}</span>

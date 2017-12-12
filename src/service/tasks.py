@@ -37,18 +37,18 @@ class TaskHandler(RestHandler):
 
     payload = json.loads(self.request.body)
     payload['dateLastActivity'] = datetime.datetime.utcnow().isoformat()
-    #task = mongodb.create(payload)
+    task = mongodb.create(payload, 'tasks')
 
-    boards = mongodb.list('boards')
-    board = (board for board in boards if board["name"] == payload['team']['label']).next()
-    phase_id = board['lists'][payload['phase']['id']]['id']
+    phase_id = payload['phase']['listId']
+    team_phase_id = payload['phase']['teamListId']
     params = { 'idList': phase_id, 'name': payload['name'], 'desc': payload['desc'], 'key': key, 'token': token }
-    #this works need to sort out what is sent from client now and ensure that when new cards
-    #are created they're added to both the relevant boards.
-    #consider making a call to get all boards ids for reference data to be used by client
+    team_params = { 'idList': team_phase_id, 'name': payload['name'], 'desc': payload['desc'], 'key': key, 'token': token }
+
     cards_url = 'https://api.trello.com/1/cards'
     requests_toolbelt.adapters.appengine.monkeypatch()
     response = requests.post(cards_url, params=params)
+    if team_phase_id is not None:
+      response = requests.post(cards_url, params=team_params)
 
     self.send_json(dumps(response.text))
 

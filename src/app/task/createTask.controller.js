@@ -1,6 +1,6 @@
 import _ from 'lodash'
 export class CreateTask {
-  constructor ($uibModalInstance, $scope, $resource) {
+  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard) {
     'ngInject';
     this.$scope = $scope;
     this.$uibModalInstance = $uibModalInstance;
@@ -11,48 +11,46 @@ export class CreateTask {
     this.team = null;
     this.phase = null;
     this.status = null;
+    this.boards = boards;
+    this.teamDisabled = false;
+    this.phaseDisabled = false;
+    this.currentBoard = currentBoard;
 
     this.teams = [
-      { id: 0, label: 'Unassigned' },
-      { id: 1, label: 'Web Team' },
-      { id: 2, label: 'Core Platforms' }
+      { status: 'Unassigned', name: 'Unassigned' }
       ];
-    this.TEAMS_CONST = {
-      UNASSIGNED: 0,
-      WEB_TEAM: 1,
-      CORE_PLATFORMS: 2
-    };this.statuses = [
-      { id: 0, label: 'Open' },
-      { id: 1, label: 'Closed' }
-      ];
-    this.STATUSES_CONST = {
-      OPEN: 0,
-      CLOSED: 1
-    };
-    this.phases = [
-      { id: 0, label: 'Requested' },
-      { id: 1, label: 'Assigned To Team' },
-      { id: 2, label: 'In Development' },
-      { id: 3, label: 'UAT Testing' },
-      { id: 4, label: 'Awaiting Client Sign-off' }
-      ];
-    this.PHASES_CONST = {
-      REQUESTED: 0,
-      ASSIGNED_TO_TEAM: 1,
-      IN_DEV: 2,
-      IN_UAT: 3,
-      AWAIT_CLIENT: 4
-    };
+    this.boards.forEach((board)=> {
+      if(!board.isParentBoard){
+        this.teams.push({ status: 'Assigned', name: board.name });
+      }
+    });
 
+    this.phases = [];
+    this.currentBoard.lists.forEach((list, i) => {
+      if(this.currentBoard.isParentBoard){
+        if(i <= 1){
+          this.phases.push({ phase: list.name, listId: list.id })
+        }
+      } else {
+        this.phases.push({ phase: list.name, listId: list.id })
+      }
+    });
+    this.statuses = [
+      { id: 0, status: 'Open' },
+      { id: 1, status: 'Closed' }
+      ];
   }
 
   ok(){
+    const phase = this.phase;
+    const teamBoard = _.find(this.boards, { 'name': this.team.name });
+    phase.teamListId = teamBoard ? teamBoard.lists[0].id : null;
     const task = {
       name: this.name,
       desc: this.desc,
       team: this.team,
-      phase: this.phase,
-      status: this.status
+      phase: phase,
+      status: this.status.status
     };
 
     this.response = this.tasksService.save(task);
@@ -70,22 +68,19 @@ export class CreateTask {
   }
 
   validateTeam(team){
+    this.phaseDisabled = false;
     this.message = null;
-    if(team.id !== this.TEAMS_CONST.UNASSIGNED && this.phase.id === this.PHASES_CONST.REQUESTED){
-      this.phase = _.find(this.phases, { id: this.PHASES_CONST.ASSIGNED_TO_TEAM })
+    if(team.status !== "Unassigned"){
+      this.phase = _.find(this.phases, {'phase': 'Assigned to team' });
+      this.phaseDisabled = true;
     }
-    if(team.id === this.TEAMS_CONST.UNASSIGNED){
-      this.phase = _.find(this.phases, { id: this.PHASES_CONST.REQUESTED })
-    }
+    this.validatePhase(this.phase);
   }
 
   validatePhase(phase){
     this.message = null;
-    if(phase.id !== this.PHASES_CONST.REQUESTED && this.team.id === this.TEAMS_CONST.UNASSIGNED){
-      this.message = 'Please ensure you choose a team when the phase is not set as \'Requested\'.'
-    }
-    if(phase.id === this.PHASES_CONST.REQUESTED){
-      this.team = _.find(this.teams, { id: this.TEAMS_CONST.UNASSIGNED });
+    if(this.team.status === "Unassigned" && phase.phase !== "Requested"){
+      this.message = "Please ensure you select a team if you wish to set the phase as 'Assigned to team'"
     }
   }
 
