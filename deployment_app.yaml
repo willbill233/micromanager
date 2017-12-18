@@ -1,0 +1,43 @@
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+handlers:
+- url: /rest/tasks
+  script: service.tasks.APP
+
+- url: /rest/task
+  script: service.tasks.APP
+
+- url: /rest/boards
+  script: service.boards.APP
+
+- url: /rest/auth
+  script: service.auth.APP
+
+- url: /
+  static_files: www/index.html
+  upload: www/index.html
+
+- url: /(.+)
+  static_files: www/\1
+  upload: www/(.*)
+
+
+skip_files:
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*
+- ^(.*/)?tests$
+- ^(.*/)?test$
+- ^test/(.*/)?
+- ^COPYING.LESSER
+- ^README\..*
+- \.gitignore
+- ^\.git/.*
+- \.*\.lint$
+- ^fabfile\.py
+- ^testrunner\.py
+- ^grunt\.js
+- ^node_modules/(.*/)?

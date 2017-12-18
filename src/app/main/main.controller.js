@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export class MainController {
-  constructor ($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state) {
+  constructor($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state) {
     'ngInject';
 
     this.$ctrl = this;
@@ -23,11 +23,11 @@ export class MainController {
     this.queryBoards.push(this.user.visibleBoards.main);
     this.currentBoard = null;
 
-    this.response = this.boardsService.query({ 'board_ids': this.queryBoards });
+    this.response = this.boardsService.query({'board_ids': this.queryBoards});
     this.isLoading = true;
     this.response.$promise.then(data => {
       this.boards = data;
-      this.onBoardClicked(_.find(this.boards, { 'idShort': this.user.visibleBoards.main }));
+      this.onBoardClicked(_.find(this.boards, {'idShort': this.user.visibleBoards.main}));
       this.isLoading = false;
     }, (reason) => {
       $log.log(reason);
@@ -50,28 +50,45 @@ export class MainController {
       }
     });
     this.modalInstance.result.then(() => {
-      //OK PRESSED
+      this.getTasksForBoard(this.currentBoard.idShort);
+      this.boardUrl = '';
+      this.setBoardUrl(this.currentBoard.idShort);
     }, () => {
       this.$log.info('modal-component dismissed at: ' + new Date());
     })
   }
 
-  onBoardClicked(board){
+  onBoardClicked(board) {
     this.currentBoard = board;
+    this.models = {
+      selected: null,
+      lists: {}
+    };
+    this.currentBoard.lists.forEach(list => {
+      this.models.lists[list.name] = [];
+    });
+    this.lists = Object.keys(this.models.lists);
     this.setBoardUrl(board.idShort);
     this.getTasksForBoard(board.idShort)
   }
 
-  onLogOutClicked(){
+  onLogOutClicked() {
     this.user = null;
     this.$state.go('signin');
   }
 
-  getTasksForBoard(id){
-    this.response = this.tasksService.query({ 'board_id': id });
+  getTasksForBoard(id) {
+    this.response = this.tasksService.query({'board_id': id});
     this.isLoading = true;
     this.response.$promise.then(data => {
       this.tasks = data;
+      this.lists.forEach(list => {
+        this.models.lists[list] = [];
+      });
+      this.tasks.forEach(task => {
+          this.models.lists[task.phase.phase].push(_.cloneDeep(task));
+        }
+      );
       this.isLoading = false;
     }, (reason) => {
       this.$log.log(reason);
@@ -79,19 +96,30 @@ export class MainController {
     });
   }
 
-  getActiveBoard(board){
-    if(_.isEqual(this.currentBoard, board)){
+  onDrop(srcList, srcIndex, targetList, targetIndex) {
+    if(this.currentBoard.isParentBoard){
+      this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
+      return false;
+    }
+    this.models.lists[targetList].splice(targetIndex, 0, srcList[srcIndex]);
+    if (_.isEqual(srcList, this.models.lists[targetList]) && targetIndex <= srcIndex) srcIndex++;
+    srcList.splice(srcIndex, 1);
+    return true;
+  };
+
+  getActiveBoard(board) {
+    if (_.isEqual(this.currentBoard, board)) {
       return "list-group-item active";
     }
     return "list-group-item"
   }
 
-  setBoardUrl(id){
-    this.boardUrl = this.$sce.trustAsResourceUrl('https://trello.com/b/'+id+'.html');
+  setBoardUrl(id) {
+    this.boardUrl = this.$sce.trustAsResourceUrl('https://trello.com/b/' + id + '.html');
   }
 
-  getAuthenticatedUser(){
-    if(this.$stateParams.user){
+  getAuthenticatedUser() {
+    if (this.$stateParams.user) {
       return this.$stateParams.user;
     }
     this.$state.go('unauthorised');

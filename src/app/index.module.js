@@ -6,7 +6,7 @@ import { SigninController } from './signin/signin.controller';
 import { UnauthorisedController } from './signin/unauthorised.controller';
 import { CreateTask } from './task/createTask.controller';
 
-angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr'])
+angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'dndLists'])
   .config(config)
   .config(routerConfig)
   .run(runBlock)

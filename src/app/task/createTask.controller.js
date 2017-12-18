@@ -42,15 +42,20 @@ export class CreateTask {
   }
 
   ok(){
+    const boards = [this.currentBoard.idShort];
     const phase = this.phase;
     const teamBoard = _.find(this.boards, { 'name': this.team.name });
     phase.teamListId = teamBoard ? teamBoard.lists[0].id : null;
+    if (teamBoard){
+      boards.push(teamBoard.idShort)
+    }
     const task = {
       name: this.name,
       desc: this.desc,
       team: this.team,
-      phase: phase,
-      status: this.status.status
+      phase,
+      status: this.status.status,
+      boards
     };
 
     this.response = this.tasksService.save(task);

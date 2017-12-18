@@ -35,13 +35,33 @@
       <div class="col-lg-2">
         <h1 class="lead">Dashboards</h1>
         <div class="list-group">
-          <a ng-repeat="board in main.boards" ng-click="main.onBoardClicked(board)" ng-class="main.getActiveBoard(board)">{{board.name}}</a>
+          <a ng-repeat="board in main.boards" ng-click="main.onBoardClicked(board)"
+             ng-class="main.getActiveBoard(board)">{{board.name}}</a>
         </div>
       </div>
 
       <!-- Main section -->
       <div class="col-lg-10">
-        <iframe style="pointer-events: none" ng-src="{{main.boardUrl}}" frameBorder="0" width="100%" height="400"></iframe>
+        <h1 class="lead" ng-if="main.currentBoard.isParentBoard">Project Overview</h1>
+        <h1 class="lead" ng-if="!main.currentBoard.isParentBoard">Development Team View</h1>
+        <span class="danger" ng-show="main.errorMessage"><i class="fa fa-exclamation-circle"></i>  {{main.errorMessage}} <span class="pull-right" style="font-size: 8px">✖</span></span>
+        <div class="row draggable-lists">
+          <div class="col-lg-2" ng-repeat="list in main.lists">
+            <div class="panel panel-info">
+              <div class="panel-heading"><h3 class="panel-title">{{list}}</h3></div>
+              <div class="panel-body">
+                <ul dnd-list dnd-drop="callback({targetList: list, targetIndex: index})">
+                  <li ng-repeat="item in main.models.lists[list]"
+                      dnd-draggable="null"
+                      dnd-callback="main.onDrop(main.models.lists[list], $index, targetList, targetIndex)">
+                    {{item.name}}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+        </div>
         <button ng-click="main.createTaskClicked()" type="button" class="btn btn-primary">Create Task</button>
         <table style="margin-top: 10px" class="table table-responsive table-dark">
           <tr>
@@ -54,8 +74,12 @@
             <td><span class="card"><span>{{task.name}}</span></span></td>
             <td>{{task.team.name}}</td>
             <td>{{task.dateLastActivity | date:'dd/MM/yyyy HH:mm'}}</td>
-            <td><button style="cursor: pointer" class="fa fa-pencil"></button></td>
-            <td><button style="cursor: pointer" class="fa fa-trash"></button></td>
+            <td>
+              <button style="cursor: pointer" class="fa fa-pencil"></button>
+            </td>
+            <td>
+              <button style="cursor: pointer" class="fa fa-trash"></button>
+            </td>
           </tr>
         </table>
         <div id="loader" ng-show="main.isLoading"></div>
