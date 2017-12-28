@@ -14,6 +14,9 @@ handlers:
 - url: /rest/task/update
   script: service.tasks.APP
 
+- url: /rest/task/delete
+  script: service.tasks.APP
+
 - url: /rest/boards
   script: service.boards.APP
 

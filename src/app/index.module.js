@@ -6,6 +6,7 @@ import { SigninController } from './signin/signin.controller';
 import { UnauthorisedController } from './signin/unauthorised.controller';
 import { CreateTask } from './task/createTask.controller';
 import { UpdateTask } from './task/updateTask.controller';
+import { DeleteTask } from './task/deleteTask.controller';
 
 angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'dndLists'])
   .config(config)
@@ -15,4 +16,5 @@ angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', '
   .controller('SigninController', SigninController)
   .controller('UnauthorisedController', UnauthorisedController)
   .controller('CreateTaskController', CreateTask)
-  .controller('UpdateTaskController', UpdateTask);
+  .controller('UpdateTaskController', UpdateTask)
+  .controller('DeleteTaskController', DeleteTask);

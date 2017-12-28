@@ -30,6 +30,10 @@ class RestHandler(webapp2.RequestHandler):
     card_url = 'https://api.trello.com/1/cards'
     return requests.post(card_url, params=params)
 
+  def delete_trello_card(self, id, params):
+    card_url = 'https://api.trello.com/1/cards/' + id
+    return requests.delete(card_url, params=params)
+
 class TasksHandler(RestHandler):
 
   def get(self):
@@ -86,9 +90,27 @@ class UpdateTaskHandler(RestHandler):
 
     self.send_json(dumps(response.text))
 
+class DeleteTaskHandler(RestHandler):
+  def post(self):
+    key = '61cf04749fda864dd404009216cbe106'
+    token = '2caecaa0245326fcc4b949a4780ad7fdcb8cd8d77b4394ad8590d244dbfa542f'
+    payload = json.loads(self.request.body)
+
+    params = { 'key': key, 'token': token }
+
+    requests_toolbelt.adapters.appengine.monkeypatch()
+    response = self.delete_trello_card(payload['projectManagementTrelloId'], params)
+    if payload.get('teamTrelloId') is not None:
+      response = self.delete_trello_card(payload['teamTrelloId'], params)
+
+    mongodb.delete(payload['_id']['$oid'], 'tasks')
+
+    self.send_json(dumps(response.text))
+
 
 APP = webapp2.WSGIApplication([
   ('/rest/tasks', TasksHandler),
   ('/rest/task/create', CreateTaskHandler),
-  ('/rest/task/update', UpdateTaskHandler)
+  ('/rest/task/update', UpdateTaskHandler),
+  ('/rest/task/delete', DeleteTaskHandler)
 ], debug=True)

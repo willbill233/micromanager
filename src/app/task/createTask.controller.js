@@ -62,10 +62,11 @@ export class CreateTask {
     this.isLoading = true;
     this.response.$promise.then(() => {
       this.isLoading = false;
+      this.$uibModalInstance.close();
     }, () => {
       this.isLoading = false;
+      this.$uibModalInstance.close();
     });
-    this.$uibModalInstance.close();
   }
 
   cancel(){

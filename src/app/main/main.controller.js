@@ -80,6 +80,24 @@ export class MainController {
     })
   }
 
+  deleteTaskClicked(task) {
+    this.modalInstance = this.$uibModal.open({
+      templateUrl: 'app/task/deletetaskmodal.html',
+      controller: 'DeleteTaskController',
+      controllerAs: '$ctrl',
+      resolve: {
+        task: () => {
+          return task;
+        }
+      }
+    });
+    this.modalInstance.result.then(() => {
+      this.getTasksForBoard(this.currentBoard.idShort);
+    }, () => {
+      this.$log.info('modal-component dismissed at: ' + new Date());
+    })
+  }
+
   onBoardClicked(board) {
     this.currentBoard = board;
     this.models = {
