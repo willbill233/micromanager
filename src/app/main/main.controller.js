@@ -51,8 +51,30 @@ export class MainController {
     });
     this.modalInstance.result.then(() => {
       this.getTasksForBoard(this.currentBoard.idShort);
-      this.boardUrl = '';
-      this.setBoardUrl(this.currentBoard.idShort);
+    }, () => {
+      this.$log.info('modal-component dismissed at: ' + new Date());
+    })
+  }
+
+  editTaskClicked(task) {
+    this.modalInstance = this.$uibModal.open({
+      templateUrl: 'app/task/updatetaskmodal.html',
+      controller: 'UpdateTaskController',
+      controllerAs: '$ctrl',
+      resolve: {
+        boards: () => {
+          return this.boards;
+        },
+        currentBoard: () => {
+          return this.currentBoard;
+        },
+        task: () => {
+          return task;
+        }
+      }
+    });
+    this.modalInstance.result.then(() => {
+      this.getTasksForBoard(this.currentBoard.idShort);
     }, () => {
       this.$log.info('modal-component dismissed at: ' + new Date());
     })
@@ -68,7 +90,6 @@ export class MainController {
       this.models.lists[list.name] = [];
     });
     this.lists = Object.keys(this.models.lists);
-    this.setBoardUrl(board.idShort);
     this.getTasksForBoard(board.idShort)
   }
 
@@ -86,7 +107,8 @@ export class MainController {
         this.models.lists[list] = [];
       });
       this.tasks.forEach(task => {
-          this.models.lists[task.phase.phase].push(_.cloneDeep(task));
+          const boardType = this.currentBoard.isParentBoard ? 'projectManager' : 'team';
+          this.models.lists[task.phase[boardType].phase].push(_.cloneDeep(task));
         }
       );
       this.isLoading = false;
@@ -97,7 +119,7 @@ export class MainController {
   }
 
   onDrop(srcList, srcIndex, targetList, targetIndex) {
-    if(this.currentBoard.isParentBoard){
+    if (this.currentBoard.isParentBoard) {
       this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
       return false;
     }
@@ -112,10 +134,6 @@ export class MainController {
       return "list-group-item active";
     }
     return "list-group-item"
-  }
-
-  setBoardUrl(id) {
-    this.boardUrl = this.$sce.trustAsResourceUrl('https://trello.com/b/' + id + '.html');
   }
 
   getAuthenticatedUser() {

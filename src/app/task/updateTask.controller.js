@@ -1,24 +1,19 @@
 import _ from 'lodash'
-export class CreateTask {
-  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard) {
+export class UpdateTask {
+  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard, task) {
     'ngInject';
     this.$scope = $scope;
     this.$uibModalInstance = $uibModalInstance;
     this.$resource = $resource;
-    this.tasksService = $resource('/rest/task/create');
-    this.name = null;
-    this.desc = null;
-    this.team = null;
-    this.phase = null;
-    this.status = null;
+    this.tasksService = $resource('/rest/task/update');
     this.boards = boards;
-    this.teamDisabled = false;
+    this.task = task;
     this.phaseDisabled = false;
     this.currentBoard = currentBoard;
 
     this.teams = [
       { status: 'Unassigned', name: 'Unassigned' }
-      ];
+    ];
     this.boards.forEach((board)=> {
       if(!board.isParentBoard){
         this.teams.push({ status: 'Assigned', name: board.name });
@@ -38,7 +33,17 @@ export class CreateTask {
     this.statuses = [
       { id: 0, status: 'Open' },
       { id: 1, status: 'Closed' }
-      ];
+    ];
+
+    this.name = this.task.name;
+    this.desc = this.task.desc;
+    this.team = _.find(this.teams, { 'name': this.task.team.name });
+    let phase = this.task.phase.projectManager.phase;
+    if(!this.currentBoard.isParentBoard){
+      phase = this.task.phase.team.phase;
+    }
+    this.phase = _.find(this.phases, { 'phase': phase });
+    this.status = _.find(this.statuses, { 'status': this.task.status });
   }
 
   ok(){
@@ -55,17 +60,21 @@ export class CreateTask {
       team: this.team,
       phase: { projectManager: this.phase, team: teamPhase },
       status: this.status.status,
-      boards
+      boards,
+      projectManagementTrelloId: this.task.projectManagementTrelloId,
+      teamTrelloId: this.task.teamTrelloId,
+      _id: this.task._id
     };
 
     this.response = this.tasksService.save(task);
     this.isLoading = true;
     this.response.$promise.then(() => {
       this.isLoading = false;
+      this.$uibModalInstance.close();
     }, () => {
       this.isLoading = false;
+      this.$uibModalInstance.close();
     });
-    this.$uibModalInstance.close();
   }
 
   cancel(){

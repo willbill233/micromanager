@@ -43,8 +43,8 @@
       <!-- Main section -->
       <div class="col-lg-10">
         <h1 class="lead" ng-if="main.currentBoard.isParentBoard">Project Overview</h1>
-        <h1 class="lead" ng-if="!main.currentBoard.isParentBoard">Development Team View</h1>
-        <span class="danger" ng-show="main.errorMessage"><i class="fa fa-exclamation-circle"></i>  {{main.errorMessage}} <span class="pull-right" style="font-size: 8px">✖</span></span>
+        <h1 class="lead" ng-if="main.currentBoard && !main.currentBoard.isParentBoard">Development Team View</h1>
+        <div class="danger" style="width: 100%" ng-show="main.errorMessage"><i class="fa fa-exclamation-circle"></i>  {{main.errorMessage}} <a class="pull-right" ng-click="main.errorMessage = ''" style="font-size: 8px">✖</a></div>
         <div class="row draggable-lists">
           <div class="col-lg-2" ng-repeat="list in main.lists">
             <div class="panel panel-info">
@@ -75,7 +75,7 @@
             <td>{{task.team.name}}</td>
             <td>{{task.dateLastActivity | date:'dd/MM/yyyy HH:mm'}}</td>
             <td>
-              <button style="cursor: pointer" class="fa fa-pencil"></button>
+              <button ng-click="main.editTaskClicked(task)" style="cursor: pointer" class="fa fa-pencil"></button>
             </td>
             <td>
               <button style="cursor: pointer" class="fa fa-trash"></button>

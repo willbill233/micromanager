@@ -86,15 +86,14 @@ def read(id, db):
 def create(data, db):
   mongo = init_app()
   new_id = mongo[db].insert(data)
-  return read(new_id, db)
 # [END create]
 
 
 # [START update]
 def update(data, id, db):
   mongo = init_app()
-  mongo[db].update({'_id': _id(id)}, data)
-  return read(id, db)
+  data['_id'] = ObjectId(id['$oid'])
+  mongo[db].update({'_id': ObjectId(id['$oid'])}, data)
 # [END update]
 
 

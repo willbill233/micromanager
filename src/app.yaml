@@ -8,7 +8,10 @@ handlers:
 - url: /rest/tasks
   script: service.tasks.APP
 
-- url: /rest/task
+- url: /rest/task/create
+  script: service.tasks.APP
+
+- url: /rest/task/update
   script: service.tasks.APP
 
 - url: /rest/boards
