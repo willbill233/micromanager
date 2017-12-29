@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export class MainController {
-  constructor($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state) {
+  constructor($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state, $window) {
     'ngInject';
 
     this.$ctrl = this;
@@ -12,9 +12,11 @@ export class MainController {
     this.$stateParams = $stateParams;
     this.$sce = $sce;
     this.$state = $state;
+    this.$window = $window;
     this.$resource = $resource;
     this.tasksService = $resource('/rest/tasks');
     this.boardsService = $resource('/rest/boards');
+    this.taskUpdateService = $resource('/rest/task/update');
     this.modalInstance = null;
     this.tasks = null;
     this.boards = null;
@@ -46,6 +48,9 @@ export class MainController {
         },
         currentBoard: () => {
           return this.currentBoard;
+        },
+        user: () => {
+          return this.user;
         }
       }
     });
@@ -108,7 +113,9 @@ export class MainController {
       this.models.lists[list.name] = [];
     });
     this.lists = Object.keys(this.models.lists);
-    this.getTasksForBoard(board.idShort)
+    this.getTasksForBoard(board.idShort);
+    console.log(this.models);
+    console.log(board);
   }
 
   onLogOutClicked() {
@@ -136,15 +143,29 @@ export class MainController {
     });
   }
 
-  onDrop(srcList, srcIndex, targetList, targetIndex) {
+  onDrop(srcList, srcIndex, targetList, targetIndex, item) {
     if (this.currentBoard.isParentBoard) {
       this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
       return false;
+    } else {
+      this.models.lists[targetList].splice(targetIndex, 0, srcList[srcIndex]);
+      if (_.isEqual(srcList, this.models.lists[targetList]) && targetIndex <= srcIndex) srcIndex++;
+      srcList.splice(srcIndex, 1);
+
+      const phase = targetList;
+      const listId = _.find(this.currentBoard.lists, { 'name': phase }).id;
+      item.phase.team = { phase, listId };
+      this.response = this.taskUpdateService.save(item);
+      this.isLoading = true;
+      this.response.$promise.then(() => {
+        this.getTasksForBoard(this.currentBoard.idShort);
+        this.isLoading = false;
+        return true;
+      }, () => {
+        this.isLoading = false;
+        return false;
+      });
     }
-    this.models.lists[targetList].splice(targetIndex, 0, srcList[srcIndex]);
-    if (_.isEqual(srcList, this.models.lists[targetList]) && targetIndex <= srcIndex) srcIndex++;
-    srcList.splice(srcIndex, 1);
-    return true;
   };
 
   getActiveBoard(board) {
@@ -159,5 +180,9 @@ export class MainController {
       return this.$stateParams.user;
     }
     this.$state.go('unauthorised');
+  }
+
+  trelloButtonClicked(){
+    this.$window.open('https://trello.com/b/' + this.currentBoard.idShort, '_blank')
   }
 }

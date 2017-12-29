@@ -14,11 +14,15 @@ export class UpdateTask {
     this.teams = [
       { status: 'Unassigned', name: 'Unassigned' }
     ];
-    this.boards.forEach((board)=> {
-      if(!board.isParentBoard){
-        this.teams.push({ status: 'Assigned', name: board.name });
-      }
-    });
+    if(this.currentBoard.isParentBoard){
+      this.boards.forEach((board)=> {
+        if(!board.isParentBoard){
+          this.teams.push({ status: 'Assigned', name: board.name });
+        }
+      });
+    } else {
+      this.teams.push({ status: 'Assigned', name: this.currentBoard.name });
+    }
 
     this.phases = [];
     this.currentBoard.lists.forEach((list, i) => {
@@ -93,7 +97,7 @@ export class UpdateTask {
 
   validatePhase(phase){
     this.message = null;
-    if(this.team.status === "Unassigned" && phase.projectManager.phase !== "Requested"){
+    if(this.team.status === "Unassigned" && phase.phase !== "Requested"){
       this.message = "Please ensure you select a team if you wish to set the phase as 'Assigned to team'"
     }
   }

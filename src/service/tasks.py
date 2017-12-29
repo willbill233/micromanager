@@ -24,7 +24,7 @@ class RestHandler(webapp2.RequestHandler):
 
   def update_trello_card(self, id, params):
     card_url = 'https://api.trello.com/1/cards/' + id
-    return requests.post(card_url, params=params)
+    return requests.put(card_url, params=params)
 
   def create_trello_card(self, params):
     card_url = 'https://api.trello.com/1/cards'
@@ -84,6 +84,10 @@ class UpdateTaskHandler(RestHandler):
         payload['teamTrelloId'] = json.loads(response.text)['id']
       else:
         response = self.update_trello_card(payload['teamTrelloId'], team_params)
+    else:
+      if payload['phase']['team']['phase'] is None:
+        params = { 'key': key, 'token': token }
+        response = self.delete_trello_card(payload['teamTrelloId'], params)
 
     payload['dateLastActivity'] = datetime.datetime.utcnow().isoformat()
     mongodb.update(payload, payload['_id'], 'tasks')

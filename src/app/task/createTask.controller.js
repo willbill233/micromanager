@@ -1,6 +1,6 @@
 import _ from 'lodash'
 export class CreateTask {
-  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard) {
+  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard, user) {
     'ngInject';
     this.$scope = $scope;
     this.$uibModalInstance = $uibModalInstance;
@@ -12,6 +12,7 @@ export class CreateTask {
     this.phase = null;
     this.status = null;
     this.boards = boards;
+    this.user = user;
     this.teamDisabled = false;
     this.phaseDisabled = false;
     this.currentBoard = currentBoard;
@@ -19,11 +20,16 @@ export class CreateTask {
     this.teams = [
       { status: 'Unassigned', name: 'Unassigned' }
       ];
+
     this.boards.forEach((board)=> {
       if(!board.isParentBoard){
         this.teams.push({ status: 'Assigned', name: board.name });
       }
     });
+
+    if(!this.currentBoard.isParentBoard){
+      this.teams = [ { status: 'Assigned', name: this.currentBoard.name } ]
+    }
 
     this.phases = [];
     this.currentBoard.lists.forEach((list, i) => {
@@ -39,6 +45,13 @@ export class CreateTask {
       { id: 0, status: 'Open' },
       { id: 1, status: 'Closed' }
       ];
+
+    if(this.user.type === 'CLIENT'){
+      this.teams = [
+        { status: 'Unassigned', name: 'Unassigned' }
+      ];
+      this.phases = [{ phase: 'Requested', listId: this.currentBoard.lists[0].id }]
+    }
   }
 
   ok(){
@@ -85,7 +98,7 @@ export class CreateTask {
 
   validatePhase(phase){
     this.message = null;
-    if(this.team.status === "Unassigned" && phase.projectManager.phase !== "Requested"){
+    if(this.team.status === "Unassigned" && phase.phase !== "Requested"){
       this.message = "Please ensure you select a team if you wish to set the phase as 'Assigned to team'"
     }
   }
