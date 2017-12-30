@@ -38,6 +38,7 @@
     </div>
     <span class="col-sm-12 danger" ng-show="$ctrl.message"><i class="fa fa-exclamation-circle"></i>  {{$ctrl.message}}</span>
   </form>
+  <div id="loader" ng-show="$ctrl.isLoading"></div>
 </div>
 <div class="modal-footer">
     <button class="btn btn-primary" type="button" ng-disabled="$ctrl.message || createTask.$invalid" ng-click="$ctrl.ok()">OK</button>

@@ -8,7 +8,7 @@
       <input type="password" ng-model="signin.password" id="inputPassword" class="form-control" placeholder="Password" required>
       <div class="checkbox">
         <label>
-          <input type="checkbox" value="remember-me"> Remember me
+          <input type="checkbox" ng-model="signin.staySignedIn" value="remember-me"> Keep me signed in
         </label>
       </div>
       <span class="danger" ng-show="signin.errorMessage"><i class="fa fa-exclamation-circle"></i>  {{signin.errorMessage}}</span>

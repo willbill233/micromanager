@@ -18,13 +18,12 @@ class RestHandler(webapp2.RequestHandler):
 
 
 class AuthHandler(RestHandler):
-
-  def post(self):
+  def get(self):
     users = mongodb.list('users')
-    payload = json.loads(self.request.body)
+    email = self.request.get('email')
     response = None
     for user in users:
-      if user["email"] == payload["email"] and user["password"] == payload["password"]:
+      if user["email"] == email:
         response = user
         response["message"] = "User Authenticated"
         response["failed"] = False

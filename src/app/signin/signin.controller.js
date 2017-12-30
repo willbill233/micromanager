@@ -1,5 +1,5 @@
 export class SigninController {
-  constructor($scope, $rootScope, $log, $resource, $state) {
+  constructor($scope, $rootScope, $log, $resource, $state, $firebaseAuth, $cookies) {
     'ngInject';
 
     this.$scope = $scope;
@@ -7,34 +7,31 @@ export class SigninController {
     this.$log = $log;
     this.$resource = $resource;
     this.$state = $state;
-    this.authService = $resource('/rest/auth');
+    this.$cookies = $cookies;
     this.user = null;
     this.email = null;
     this.password = null;
     this.errorMessage = null;
+    this.staySignedIn = true;
+    this.auth = $firebaseAuth();
+    this.user = this.$cookies.getObject('user');
+    if(this.user){
+      this.$state.go('home');
+    }
   }
 
   onSigninClicked() {
-    this.user = {
-      email: this.email,
-      password: this.password
-    };
-    this.response = this.authService.save(this.user);
-    this.isLoading = true;
-    this.response.$promise.then(data => {
-      this.user = null;
-      this.email = null;
-      this.password = null;
-      this.isLoading = false;
-      if(!data.failed){
-        this.$state.go('home', { user: data });
-      } else {
-        this.errorMessage = data.message;
+    this.auth.$signInWithEmailAndPassword(this.email, this.password).then(user => {
+      this.user = user;
+      this.today = new Date();
+      this.expiresValue = new Date(this.today);
+      this.expiresValue.setSeconds(this.today.getSeconds() + 3600);
+      if (this.staySignedIn){
+        this.$cookies.putObject('user', this.user, { 'expires': this.expiresValue });
       }
-    }, (reason) => {
-      this.isLoading = false;
-      this.$log.log(reason);
-      this.errorMessage = reason;
+      this.$state.go('home');
+    }, (error) => {
+      this.errorMessage = "Authentication failed: " + error;
     });
   }
 }

@@ -5,10 +5,7 @@ export function routerConfig ($stateProvider, $urlRouterProvider) {
       url: '/home',
       templateUrl: 'app/main/main.html',
       controller: 'MainController',
-      controllerAs: 'main',
-      params: {
-        user: null
-      }
+      controllerAs: 'main'
     })
     .state('signin', {
       url: '/',

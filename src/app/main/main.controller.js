@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 export class MainController {
-  constructor($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state, $window) {
+  constructor($uibModal, $scope, $rootScope, $log, $resource, $stateParams, $sce, $state, $window, $firebaseAuth, $cookies) {
     'ngInject';
 
     this.$ctrl = this;
@@ -13,27 +13,52 @@ export class MainController {
     this.$sce = $sce;
     this.$state = $state;
     this.$window = $window;
+    this.auth = $firebaseAuth();
+    this.$cookies = $cookies;
     this.$resource = $resource;
     this.tasksService = $resource('/rest/tasks');
     this.boardsService = $resource('/rest/boards');
     this.taskUpdateService = $resource('/rest/task/update');
+    this.authService = $resource('/rest/auth');
     this.modalInstance = null;
     this.tasks = null;
     this.boards = null;
-    this.user = this.getAuthenticatedUser();
+    this.isLoading = true;
+    this.getAuthenticatedUserProperties();
+  }
+
+  getAuthenticatedUserProperties(){
+    this.fireBaseUser = this.auth.$getAuth();
+    this.userSession = this.$cookies.getObject('user');
+    if (!this.fireBaseUser) {
+      if (!this.userSession){
+        this.$state.go('unauthorised');
+      } else {
+        this.fireBaseUser = this.userSession;
+      }
+    }
+    this.response = this.authService.get({ email: this.fireBaseUser.email });
+    this.response.$promise.then(data => {
+      this.user = data;
+      this.getBoards();
+      if (data.failed) {
+        this.$state.go('unauthorised');
+      }
+    }, () => {
+      this.$state.go('unauthorised');
+    });
+  }
+
+  getBoards() {
     this.queryBoards = this.user.visibleBoards.secondary.slice(0);
     this.queryBoards.push(this.user.visibleBoards.main);
     this.currentBoard = null;
-
     this.response = this.boardsService.query({'board_ids': this.queryBoards});
-    this.isLoading = true;
     this.response.$promise.then(data => {
       this.boards = data;
       this.onBoardClicked(_.find(this.boards, {'idShort': this.user.visibleBoards.main}));
-      this.isLoading = false;
     }, (reason) => {
-      $log.log(reason);
-      this.isLoading = false;
+      this.$log.log(reason);
     });
   }
 
@@ -114,18 +139,19 @@ export class MainController {
     });
     this.lists = Object.keys(this.models.lists);
     this.getTasksForBoard(board.idShort);
-    console.log(this.models);
-    console.log(board);
   }
 
   onLogOutClicked() {
     this.user = null;
-    this.$state.go('signin');
+    this.fireBaseUser = null;
+    this.$cookies.remove('user');
+    this.auth.$signOut().then(() => {
+      this.$state.go('signin');
+    });
   }
 
   getTasksForBoard(id) {
     this.response = this.tasksService.query({'board_id': id});
-    this.isLoading = true;
     this.response.$promise.then(data => {
       this.tasks = data;
       this.lists.forEach(list => {
@@ -153,8 +179,8 @@ export class MainController {
       srcList.splice(srcIndex, 1);
 
       const phase = targetList;
-      const listId = _.find(this.currentBoard.lists, { 'name': phase }).id;
-      item.phase.team = { phase, listId };
+      const listId = _.find(this.currentBoard.lists, {'name': phase}).id;
+      item.phase.team = {phase, listId};
       this.response = this.taskUpdateService.save(item);
       this.isLoading = true;
       this.response.$promise.then(() => {
@@ -175,14 +201,7 @@ export class MainController {
     return "list-group-item"
   }
 
-  getAuthenticatedUser() {
-    if (this.$stateParams.user) {
-      return this.$stateParams.user;
-    }
-    this.$state.go('unauthorised');
-  }
-
-  trelloButtonClicked(){
+  trelloButtonClicked() {
     this.$window.open('https://trello.com/b/' + this.currentBoard.idShort, '_blank')
   }
 }

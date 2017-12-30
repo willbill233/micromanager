@@ -8,7 +8,7 @@ import { CreateTask } from './task/createTask.controller';
 import { UpdateTask } from './task/updateTask.controller';
 import { DeleteTask } from './task/deleteTask.controller';
 
-angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'dndLists'])
+angular.module('umanager', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'dndLists', 'firebase'])
   .config(config)
   .config(routerConfig)
   .run(runBlock)
