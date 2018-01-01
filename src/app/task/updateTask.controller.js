@@ -25,14 +25,8 @@ export class UpdateTask {
     }
 
     this.phases = [];
-    this.currentBoard.lists.forEach((list, i) => {
-      if(this.currentBoard.isParentBoard){
-        if(i <= 1){
-          this.phases.push({ phase: list.name, listId: list.id })
-        }
-      } else {
-        this.phases.push({ phase: list.name, listId: list.id })
-      }
+    this.currentBoard.lists.forEach((list) => {
+      this.phases.push({ phase: list.name, listId: list.id })
     });
     this.statuses = [
       { id: 0, status: 'Open' },
@@ -70,15 +64,25 @@ export class UpdateTask {
       _id: this.task._id
     };
 
-    this.response = this.tasksService.save(task);
-    this.isLoading = true;
-    this.response.$promise.then(() => {
-      this.isLoading = false;
-      this.$uibModalInstance.close();
-    }, () => {
-      this.isLoading = false;
-      this.$uibModalInstance.close();
-    });
+    if (this.currentBoard.isParentBoard) {
+      if(task.phase.team.phase !== 'Ready for UAT' && !['Requested', 'Assigned to team'].includes(task.phase.projectManager.phase)){
+        this.message = task.team.name + ' have not finished development of this task. Please ensure task is marked as \'Ready for UAT\' before changing project overview phase.';
+        return false;
+      }
+      if(task.phase.projectManager.phase === 'Requested'){
+        task.phase.team = { phase: null, listId: null };
+        task.team = { name: 'Unassigned', status: 'Unassigned'};
+      }
+      const phase = task.phase.projectManager.phase;
+      const listId = _.find(this.currentBoard.lists, {'name': phase}).id;
+      task.phase.projectManager = {phase, listId};
+      this.updateTask(task);
+    } else {
+      this.assignPhases(task);
+      this.updateTask(task);
+    }
+
+
   }
 
   cancel(){
@@ -102,4 +106,32 @@ export class UpdateTask {
     }
   }
 
+  assignPhases(task){
+    const teamPhase = task.phase.team.phase;
+    const listId = _.find(this.currentBoard.lists, {'name': teamPhase}).id;
+    const parentBoard = _.find(this.boards, { 'idShort': this.currentBoard.parentBoard});
+    let pmListId = null;
+    let phase = null;
+    if(teamPhase === 'Ready for UAT'){
+      pmListId = _.find(parentBoard.lists, { 'name': 'Development complete' }).id;
+      phase = 'Development complete';
+    } else {
+      pmListId = _.find(parentBoard.lists, { 'name': 'Assigned to team' }).id;
+      phase = 'Assigned to team';
+    }
+    task.phase.team = {phase: teamPhase, listId: listId};
+    task.phase.projectManager = {phase: phase, listId: pmListId};
+  }
+
+  updateTask(task){
+    this.response = this.tasksService.save(task);
+    this.isLoading = true;
+    this.response.$promise.then(() => {
+      this.isLoading = false;
+      this.$uibModalInstance.close();
+    }, () => {
+      this.isLoading = false;
+      this.$uibModalInstance.close();
+    });
+  }
 }

@@ -151,6 +151,7 @@ export class MainController {
   }
 
   getTasksForBoard(id) {
+    this.isLoading = true;
     this.response = this.tasksService.query({'board_id': id});
     this.response.$promise.then(data => {
       this.tasks = data;
@@ -171,28 +172,66 @@ export class MainController {
 
   onDrop(srcList, srcIndex, targetList, targetIndex, item) {
     if (this.currentBoard.isParentBoard) {
-      this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
-      return false;
-    } else {
-      this.models.lists[targetList].splice(targetIndex, 0, srcList[srcIndex]);
-      if (_.isEqual(srcList, this.models.lists[targetList]) && targetIndex <= srcIndex) srcIndex++;
-      srcList.splice(srcIndex, 1);
-
+      if(!item.phase.team.phase){
+        this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
+        return false;
+      }
+      if(item.phase.team.phase !== 'Ready for UAT' && !['Requested', 'Assigned to team'].includes(targetList)){
+        this.errorMessage = item.team.name + ' have not finished development of this task. Please ensure task is marked as \'Ready for UAT\' before changing project overview phase.';
+        return false;
+      }
+      if(targetList === 'Requested'){
+        item.phase.team = { phase: null, listId: null };
+        item.team = { name: 'Unassigned', status: 'Unassigned'};
+      }
+      this.changeListPosition(srcList, srcIndex, targetList, targetIndex);
       const phase = targetList;
       const listId = _.find(this.currentBoard.lists, {'name': phase}).id;
-      item.phase.team = {phase, listId};
-      this.response = this.taskUpdateService.save(item);
-      this.isLoading = true;
-      this.response.$promise.then(() => {
-        this.getTasksForBoard(this.currentBoard.idShort);
-        this.isLoading = false;
-        return true;
-      }, () => {
-        this.isLoading = false;
-        return false;
-      });
+      item.phase.projectManager = {phase, listId};
+      return this.updateTaskPhase(item);
+    } else {
+      //List changing logic
+      this.changeListPosition(srcList, srcIndex, targetList, targetIndex);
+      this.assignPhases(item, targetList);
+      return this.updateTaskPhase(item);
     }
   };
+
+  updateTaskPhase(item){
+    this.response = this.taskUpdateService.save(item);
+    this.isLoading = true;
+    this.response.$promise.then(() => {
+      this.getTasksForBoard(this.currentBoard.idShort);
+      this.isLoading = false;
+      return true;
+    }, () => {
+      this.isLoading = false;
+      return false;
+    });
+  }
+
+  changeListPosition(srcList, srcIndex, targetList, targetIndex){
+    this.models.lists[targetList].splice(targetIndex, 0, srcList[srcIndex]);
+    if (_.isEqual(srcList, this.models.lists[targetList]) && targetIndex <= srcIndex) srcIndex++;
+    srcList.splice(srcIndex, 1);
+  }
+
+  assignPhases(item, targetList){
+    const teamPhase = targetList;
+    const listId = _.find(this.currentBoard.lists, {'name': teamPhase}).id;
+    const parentBoard = _.find(this.boards, { 'idShort': this.currentBoard.parentBoard});
+    let pmListId = null;
+    let phase = null;
+    if(teamPhase === 'Ready for UAT'){
+      pmListId = _.find(parentBoard.lists, { 'name': 'Development complete' }).id;
+      phase = 'Development complete';
+    } else {
+      pmListId = _.find(parentBoard.lists, { 'name': 'Assigned to team' }).id;
+      phase = 'Assigned to team';
+    }
+    item.phase.team = {phase: teamPhase, listId: listId};
+    item.phase.projectManager = {phase: phase, listId: pmListId};
+  }
 
   getActiveBoard(board) {
     if (_.isEqual(this.currentBoard, board)) {

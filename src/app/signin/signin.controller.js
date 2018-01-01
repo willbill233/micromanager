@@ -21,6 +21,7 @@ export class SigninController {
   }
 
   onSigninClicked() {
+    this.isLoading = true;
     this.auth.$signInWithEmailAndPassword(this.email, this.password).then(user => {
       this.user = user;
       this.today = new Date();
@@ -29,8 +30,10 @@ export class SigninController {
       if (this.staySignedIn){
         this.$cookies.putObject('user', this.user, { 'expires': this.expiresValue });
       }
+      this.isLoading = false;
       this.$state.go('home');
     }, (error) => {
+      this.isLoading = false;
       this.errorMessage = "Authentication failed: " + error;
     });
   }
