@@ -1,0 +1,42 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-title">Task</h3>
+</div>
+<div class="modal-body" id="modal-body">
+  <form class="form-horizontal" role="form" name="task">
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Name</label>
+      <div class="col-sm-10" style="margin-top: 7px">
+        <span >{{$ctrl.task.name}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Description</label>
+      <div class="col-sm-10" style="margin-top: 7px">
+        <span>{{$ctrl.task.desc}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Team </label>
+      <div class="col-sm-10" style="margin-top: 7px">
+        <span>{{$ctrl.task.team.name}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Phase</label>
+      <div class="col-sm-10" style="margin-top: 7px">
+        <span>{{$ctrl.currentBoard.isParentBoard ? $ctrl.task.phase.projectManager.phase : $ctrl.task.phase.team.phase}}</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="col-sm-2 control-label">Status</label>
+      <div class="col-sm-10" style="margin-top: 7px">
+        <span>{{$ctrl.task.status}}</span>
+      </div>
+    </div>
+  </form>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-primary" type="button" ng-click="$ctrl.ok()">
+    OK
+  </button>
+</div>

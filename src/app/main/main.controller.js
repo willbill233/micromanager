@@ -144,6 +144,22 @@ export class MainController {
     this.getTasksForBoard(board.idShort);
   }
 
+  onTaskClicked(task){
+    this.modalInstance = this.$uibModal.open({
+      templateUrl: 'app/task/viewtaskmodal.html',
+      controller: 'ViewTaskController',
+      controllerAs: '$ctrl',
+      resolve: {
+        task: () => {
+          return task;
+        },
+        currentBoard: () => {
+          return this.currentBoard;
+        }
+      }
+    });
+  }
+
   onLogOutClicked() {
     this.user = null;
     this.fireBaseUser = null;

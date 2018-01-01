@@ -60,17 +60,17 @@
 
         </div>
         <button ng-click="main.createTaskClicked()" type="button" class="btn btn-primary"><span ng-if="main.user.type !== 'CLIENT'">Create Task</span><span ng-if="main.user.type === 'CLIENT'">Request Functionality</span></button>
-        <table style="margin-top: 10px" class="table table-responsive table-dark">
+        <table style="margin-top: 10px" class="table table-responsive table-dark table-hover">
           <tr>
             <th>Task</th>
             <th>Team</th>
             <th>Last Update</th>
             <th colspan="2">Actions</th>
           </tr>
-          <tr ng-repeat="task in main.tasks">
-            <td><span class="card"><span>{{task.name}}</span></span></td>
-            <td>{{task.team.name}}</td>
-            <td>{{task.dateLastActivity | date:'dd/MM/yyyy HH:mm'}}</td>
+          <tr ng-repeat="task in main.tasks" style="cursor: pointer">
+            <td ng-click="main.onTaskClicked(task)"><span class="card"><span>{{task.name}}</span></span></td>
+            <td ng-click="main.onTaskClicked(task)">{{task.team.name}}</td>
+            <td ng-click="main.onTaskClicked(task)">{{task.dateLastActivity | date:'dd/MM/yyyy HH:mm'}}</td>
             <td>
               <button ng-hide="main.user.type === 'CLIENT' && task.phase.projectManager.phase !== 'Requested'" ng-click="main.editTaskClicked(task)" style="cursor: pointer" class="fa fa-pencil"></button>
             </td>

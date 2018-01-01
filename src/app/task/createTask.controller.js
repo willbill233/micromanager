@@ -55,18 +55,27 @@ export class CreateTask {
   }
 
   ok(){
-    const boards = [this.currentBoard.idShort];
+    let boards = [this.currentBoard.idShort];
     const teamBoard = _.find(this.boards, { 'name': this.team.name });
     const teamId = teamBoard ? teamBoard.lists[0].id : null;
-    const teamPhase = teamId ? { phase: 'Awaiting Development', listId: teamId } : { phase: null, listId: null };
+    let teamPhase = teamId ? { phase: 'Awaiting Development', listId: teamId } : { phase: null, listId: null };
+    let phase = this.phase;
     if (teamBoard){
       boards.push(teamBoard.idShort)
+    }
+    if (!this.currentBoard.isParentBoard){
+      const parentBoard = _.find(this.boards, { 'idShort': this.currentBoard.parentBoard });
+      const listName = this.phase.phase === 'Ready for UAT' ? 'Development complete' : 'Assigned to team';
+      const list = _.find(parentBoard.lists, { 'name': listName });
+      boards = [this.currentBoard.idShort, parentBoard.idShort];
+      phase = { phase: 'Assigned to team', listId: list.id};
+      teamPhase = this.phase;
     }
     const task = {
       name: this.name,
       desc: this.desc,
       team: this.team,
-      phase: { projectManager: this.phase, team: teamPhase },
+      phase: { projectManager: phase, team: teamPhase },
       status: this.status.status,
       boards
     };
