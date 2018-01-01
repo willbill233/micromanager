@@ -1,6 +1,6 @@
 import _ from 'lodash'
 export class UpdateTask {
-  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard, task) {
+  constructor ($uibModalInstance, $scope, $resource, boards, currentBoard, task, user) {
     'ngInject';
     this.$scope = $scope;
     this.$uibModalInstance = $uibModalInstance;
@@ -8,6 +8,7 @@ export class UpdateTask {
     this.tasksService = $resource('/rest/task/update');
     this.boards = boards;
     this.task = task;
+    this.user = user;
     this.phaseDisabled = false;
     this.currentBoard = currentBoard;
 
@@ -42,6 +43,7 @@ export class UpdateTask {
     }
     this.phase = _.find(this.phases, { 'phase': phase });
     this.status = _.find(this.statuses, { 'status': this.task.status });
+    this.setClientDefaults();
   }
 
   ok(){
@@ -81,8 +83,6 @@ export class UpdateTask {
       this.assignPhases(task);
       this.updateTask(task);
     }
-
-
   }
 
   cancel(){
@@ -133,5 +133,14 @@ export class UpdateTask {
       this.isLoading = false;
       this.$uibModalInstance.close();
     });
+  }
+
+  setClientDefaults(){
+    if(this.user.type === 'CLIENT'){
+      this.phases = [{ phase: 'Requested', listId: this.currentBoard.lists[0].id }];
+      this.teams = [{ name: 'Unassigned', status: 'Unassigned' }];
+      this.phase = this.phases[0];
+      this.team = this.teams[0];
+    }
   }
 }

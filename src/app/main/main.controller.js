@@ -100,6 +100,9 @@ export class MainController {
         },
         task: () => {
           return task;
+        },
+        user: () => {
+          return this.user;
         }
       }
     });
@@ -171,6 +174,9 @@ export class MainController {
   }
 
   onDrop(srcList, srcIndex, targetList, targetIndex, item) {
+    if(this.user.type === 'CLIENT'){
+      this.errorMessage = 'You do not have permissions to change phase.'
+    }
     if (this.currentBoard.isParentBoard) {
       if(!item.phase.team.phase){
         this.errorMessage = 'Changing phases must be carried out by editing the task, as a team needs to be assigned.';
