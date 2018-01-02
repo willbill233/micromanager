@@ -192,6 +192,7 @@ export class MainController {
   onDrop(srcList, srcIndex, targetList, targetIndex, item) {
     if(this.user.type === 'CLIENT'){
       this.errorMessage = 'You do not have permissions to change phase.'
+      return false;
     }
     if (this.currentBoard.isParentBoard) {
       if(!item.phase.team.phase){
